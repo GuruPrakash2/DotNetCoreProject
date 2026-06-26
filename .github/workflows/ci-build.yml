@@ -1,0 +1,33 @@
+name: .NET CI Build
+
+# Triggers the workflow only on pull requests targeting the main branch
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Check out the repository code
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # 2. Set up the .NET Core environment
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x' 
+
+    # 3. Restore NuGet packages
+    - name: Restore dependencies
+      run: dotnet restore
+
+    # 4. Build the application
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+
+    # 5. Run tests (If tests fail, the build fails, and the merge is blocked)
+    - name: Test
+      run: dotnet test --no-build --verbosity normal --configuration Release

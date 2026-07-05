@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NGWalks.API.Data;
 using NGWalks.API.Models.Domain;
+using NZWalks.API.CustomActionFilters;
 using NZWalks.API.Models.DT;
 using NZWalks.API.Repositories;
 
@@ -68,6 +69,7 @@ namespace NZWalks.API.Controllers
         }
 
         [HttpPost]
+        [ValidateModel]
         public async Task<IActionResult> Create([FromBody] RegionRequestDto regionRequestDto)
         {
             var region = mapper.Map<Region>(regionRequestDto);
@@ -81,6 +83,7 @@ namespace NZWalks.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [ValidateModel]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] RegionRequestDto regionRequestDto)
         {
             //dto to domail

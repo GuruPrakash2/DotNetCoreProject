@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Core.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using NGWalks.API.Models.Domain;
 using NZWalks.API.CustomActionFilters;
 using NZWalks.API.Models.DT;
 using NZWalks.API.Repositories;
+using System.Text.Json;
 
 namespace NZWalks.API.Controllers
 {
@@ -18,17 +20,21 @@ namespace NZWalks.API.Controllers
         private readonly NzWalksDbContext dbContext;
         private readonly IRegionRepository regionRepository;
         private readonly IMapper mapper;
-        public RegionsController(NzWalksDbContext dbContext, IRegionRepository regionRepository, IMapper mapper)
+        private readonly ILogger<RegionsController> logger;
+
+        public RegionsController(NzWalksDbContext dbContext, IRegionRepository regionRepository, IMapper mapper, ILogger<RegionsController> logger)
         {
             this.dbContext = dbContext;
             this.regionRepository = regionRepository;
             this.mapper = mapper;
+            this.logger = logger;
         }
 
         [HttpGet]
         [Authorize(Roles = "Reader")]
         public async Task<IActionResult> GetAll()
         {
+            logger.LogInformation("GetAll method in RegionsController called");
             //Get data from database -> domain models
             var regions = await regionRepository.GetAllAsync();
             //Now need to map that domain data to DTO
@@ -44,6 +50,8 @@ namespace NZWalks.API.Controllers
             //        RegionImageUrl = region.RegionImageUrl
             //    });
             //}
+
+            logger.LogInformation($"GetAll method in RegionsController completed with data :{JsonSerializer.Serialize(regions)}");
 
             //map domain models to DTOs
             var regionDto = mapper.Map<List<RegionDto>>(regions);
